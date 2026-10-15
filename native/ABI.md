@@ -1,0 +1,11 @@
+# Physics ABI subset
+
+Upstream source is untouched. `generate-loader.py` copies only affected managed declarations into obj/PhysicsOverlay and preserves their public signatures. No desktop-only native package is loaded on web.
+
+Box2D 3.1.1: default world/body/shape/material/filter definitions, version, create/destroy world and body, world step, make box, polygon shape attachment, body position/rotation and impulse-to-center. BRUTAL explicit x64 records remain wire records on both architectures; native `box2d_bridge.c` converts all definition fields (including pointer slots) into each target's native layout. Pointer-free IDs, polygon, filter and surface material sizes have compile-time assertions. Calls use pointers/out parameters to avoid wasm struct-by-value limitations. Custom managed task/collision delegates are not covered by the jam layer.
+
+Jolt commit e77f175595e64cb44218cc9d9d56fc365ad0e36a (5.6.0): allocator/type registration, factory lifetime, layer tables/filters, PhysicsSystem creation/init/update/body interface, temporary allocator, single-thread job executor, box shapes/density/reference release, body creation/settings/destruction, poses and impulses. `jolt_bridge.cpp` implements BRUTAL's native entry-point names; three vector/quaternion-by-value calls normalize to pointers. Shape constructors acquire a reference owned by the managed handle; body/settings references are independent. Borrowed BodyInterface handles are never destroyed.
+
+Both layers own their worlds and fixed-step state. Reset destroys native bodies/worlds and rebuilds the scene; disposal is idempotent. The CPU acceptance probe executes the real SampleGame with null graphics/audio, checking gravity, toppling, floor retention and reset. Browser tests inspect the same native positions and visible rendered boxes.
+
+This is a supported subset, not an implementation of every generated BRUTAL physics method. Extend the shim and overlays with focused ABI/runtime checks before exposing another capability to a game. The checked-in upstream generated callback/character wrappers still produce trim-analyzer warnings when compiled; those APIs are not part of this subset and are trimmed from the shipped scene.

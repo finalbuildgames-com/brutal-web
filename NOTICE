@@ -1,0 +1,48 @@
+BRUTAL Web Build Kit
+Copyright (c) 2026 Final Build Games. FBS-authored code in this folder is MIT.
+The MIT grant does not relicense the dependencies or the BRUTAL branding asset.
+
+BRUTAL game development framework is Copyright (c) 2024 Ahwoo Limited.
+This product is built with BRUTAL, a game development framework by Ahwoo Limited,
+used under the BRUTAL License v1.0. https://ahwoo.com/brutal
+Upstream: https://github.com/ahwootech/BRUTAL
+Pin: b30520d784f71bc3b3fa7907a75e985d6690e326
+
+BRUTAL retains its own MIT-derived license with attribution/branding conditions;
+it is not being represented as plain SPDX MIT. Unmodified license and notice are
+in licenses/BRUTAL-LICENSE.txt and licenses/BRUTAL-NOTICE.txt. The sample carries
+credits and the unaltered logo from https://github.com/ahwootech/brutal-branding
+(branding notice: licenses/BRUTAL-BRANDING-NOTICE.txt).
+
+Web native/runtime components:
+- Emscripten 3.1.56, Copyright (c) 2010-2014 Emscripten authors. MIT / NCSA.
+  Includes GLFW 2/3 emulation (Copyright 2013 The Emscripten Authors), GLES to
+  WebGL2 glue, HTML5 main loop, memory/libc support. licenses/EMSCRIPTEN-LICENSE.txt.
+  This is Emscripten's GLFW emulation, not BRUTAL's desktop fork of GLFW 3.5.1.
+- musl libc and its contributors, MIT and the additional notices reproduced in
+  licenses/MUSL-COPYRIGHT.txt.
+- LLVM compiler-rt builtins: Apache-2.0 with LLVM exceptions; see its bundled license.
+- .NET/Mono 10.0.10 native browser runtime, .NET managed runtime/libraries:
+  MIT, Copyright (c) .NET Foundation and Contributors.
+  licenses/DOTNET-LICENSE.txt and licenses/DOTNET-THIRD-PARTY-NOTICES.txt.
+- raylib 6.0, Copyright (c) 2013-2026 Ramon Santamaria, zlib license.
+  RAYLIB-LICENSE.txt; bundled miniaudio, stb, cgltf, dr_libs, codec and helper
+  notices in RAYLIB-THIRD-PARTY.txt. Bundled GLFW desktop license in GLFW-LICENSE.txt.
+  No upstream raylib source is modified. GLES3/WebGL2 on web; OpenGL 3.3 desktop.
+- The .NET 10 Wasm SjLj helper bridge adapts Emscripten 3.1.57 code, Copyright
+  2020 The Emscripten Authors, under its MIT license. See native/wasm_sjlj.c.
+
+The public host links Box2D 3.1.1 (MIT, Copyright 2022 Erin Catto) and
+Jolt 5.6.0 (MIT, Copyright 2021 Jorrit Rouwe). Full licenses are in
+licenses/BOX2D-LICENSE.txt and JOLT-LICENSE.txt. BRUTAL binding notices
+are copied into each package. The public default links no private FBS module or RmlUi.
+Optional external adapters bring their own notices; packaging copies their
+NOTICE and licenses folder alongside the public notices.
+
+Managed dependencies: CommunityToolkit.HighPerformance (MIT), Microsoft.Extensions
+Logging/ObjectPool (MIT). .NET third-party notices are bundled. Development-only
+Playwright Core is Apache-2.0 and does not ship in the web package.
+
+The native Emscripten GLFW/GLES implementation, C runtime and .NET runtime keep
+their upstream terms. Shipping packages include this notice, the full licenses,
+and the selected BRUTAL per-library notices in licenses/.

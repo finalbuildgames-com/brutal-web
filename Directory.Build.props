@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GameSource Condition="'$(GameSource)' == '' and Exists('$(MSBuildThisFileDirectory)../game/SampleGame.cs')">$(MSBuildThisFileDirectory)../game/**/*.cs</GameSource>
+    <GameSource Condition="'$(GameSource)' == ''">$(MSBuildThisFileDirectory)shared/SampleGame.cs</GameSource>
+    <JamAdapterRoot Condition="'$(JamAdapterRoot)' == ''">$(BRUTAL_ADAPTER_ROOT)</JamAdapterRoot>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <BrutalSource Condition="'$(BrutalSource)' == '' and '$(BRUTAL_SOURCE)' != ''">$(BRUTAL_SOURCE)</BrutalSource>
+    <BrutalSource Condition="'$(BrutalSource)' == ''">$(MSBuildThisFileDirectory)upstream/brutal</BrutalSource>
+    <NoWarn>$(NoWarn);CS0105;CS8933;CS8981</NoWarn>
+  </PropertyGroup>
+</Project>

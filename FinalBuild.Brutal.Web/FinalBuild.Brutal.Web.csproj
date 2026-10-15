@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <DefineConstants>$(DefineConstants);BRUTAL_BROWSER</DefineConstants>
+    <SupportedOSPlatformVersion>1.0</SupportedOSPlatformVersion>
+    <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+    <WasmBuildNative>true</WasmBuildNative>
+    <WasmEnableThreads>false</WasmEnableThreads>
+    <DefineConstants Condition="'$(WasmEnableThreads)' == 'true'">$(DefineConstants);BRUTAL_THREADS</DefineConstants>
+    <NuGetLockFilePath Condition="'$(WasmEnableThreads)' == 'true'">packages-threaded.lock.json</NuGetLockFilePath>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <EmccExtraLDFlags>$(EmccExtraLDFlags) -sUSE_GLFW=3 -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sFULL_ES3=1 -sSUPPORT_LONGJMP=wasm</EmccExtraLDFlags>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(WasmEnableThreads)' == 'true'"><PackageReference Include="Microsoft.NET.WebAssembly.Threading" Version="10.0.10" /></ItemGroup>
+  <Import Project="../Shared.projitems" />
+  <Import Project="../build/NativeReferences-$(WasmEnableThreads).props" />
+  <!-- .NET 10.0.10 omits this generated header from runtime.c's dependency list. -->
+  <Target Name="TrackInterpreterSignatures" AfterTargets="_GenerateManagedToNative">
+    <ItemGroup>
+      <_WasmRuntimePackSrcFile Update="$(_WasmRuntimePackSrcDir)runtime.c">
+        <Dependencies>%(_WasmRuntimePackSrcFile.Dependencies);$(_WasmInterpToNativeTablePath)</Dependencies>
+      </_WasmRuntimePackSrcFile>
+    </ItemGroup>
+  </Target>
+</Project>

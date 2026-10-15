@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+build/
+node_modules/
+upstream/
+
+**/__pycache__/
+
+# Keep local verification receipts out of release source.
+evidence/

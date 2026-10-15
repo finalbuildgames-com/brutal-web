@@ -1,0 +1,7 @@
+{
+  "name": "finalbuild-brutal-web-verification",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node verify-browser.mjs", "serve": "node serve.mjs" },
+  "devDependencies": { "playwright-core": "1.61.0" }
+}

@@ -1,0 +1,10 @@
+<Project>
+ <ItemGroup>
+  <Compile Include="$(BrutalSource)/Brutal.Box2D/*.cs" Exclude="$(BrutalSource)/Brutal.Box2D/Box2D.cs;$(BrutalSource)/Brutal.Box2D/Box2D.gen.cs" />
+  <Compile Include="$(IntermediateOutputPath)PhysicsOverlay/Box2D.g.cs" />
+  <PhysicsOverlayFile Include="Generated/Jolt.gen.cs;Generated/Classes/CharacterBase.gen.cs;Generated/Classes/PhysicsMaterial.gen.cs;Generated/Classes/RTTI.gen.cs;Generated/PInvoke/BoxShape.gen.cs;Generated/PInvoke/BodyCreationSettings.gen.cs;Generated/PInvoke/BodyInterface.gen.cs" />
+  <Compile Include="$(BrutalSource)/Brutal.Jolt/**/*.cs;$(BrutalSource)/Brutal.Concurrency/**/*.cs" Exclude="@(PhysicsOverlayFile->'$(BrutalSource)/Brutal.Jolt/%(Identity)');$(BrutalSource)/Brutal.Concurrency/Jobs/JobRunner.cs" />
+  <Compile Include="$(IntermediateOutputPath)PhysicsOverlay/JobRunner.cs" />
+  <Compile Include="@(PhysicsOverlayFile->'$(IntermediateOutputPath)PhysicsOverlay/%(Identity)')" />
+ </ItemGroup>
+</Project>

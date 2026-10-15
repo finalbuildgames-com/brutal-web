@@ -1,0 +1,18 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)Physics.projitems" />
+  <ItemGroup>
+    <Compile Include="$(BrutalSource)/Brutal.Core/**/*.cs;$(BrutalSource)/Brutal.Numerics/**/*.cs;$(BrutalSource)/Brutal.Maths/**/*.cs;$(BrutalSource)/Brutal.Memory/**/*.cs;$(BrutalSource)/Brutal.Collections/**/*.cs;$(BrutalSource)/Brutal.Interop/**/*.cs;$(BrutalSource)/Brutal.Strings/**/*.cs;$(BrutalSource)/Brutal.Logging/**/*.cs"
+      Exclude="$(BrutalSource)/Brutal.Logging/LogCategory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)shared/*.cs;$(IntermediateOutputPath)LogCategory.g.cs" Exclude="$(MSBuildThisFileDirectory)shared/SampleGame.cs" />
+    <Compile Include="$(GameSource)" />
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="10.0.0" />
+    <!-- Only the analyzer is used; all BRUTAL runtime code is compiled from the subtree. -->
+    <PackageReference Include="Ahwoo.BRUTAL.Interop" Version="2026.10.1" IncludeAssets="analyzers" PrivateAssets="all" />
+  </ItemGroup>
+  <Target Name="GenerateBrutalHostOverlay" BeforeTargets="BeforeCompile">
+    <Exec Command="python3 &quot;$(MSBuildThisFileDirectory)generate-loader.py&quot; &quot;$(BrutalSource)&quot; &quot;$(IntermediateOutputPath)LogCategory.g.cs&quot;" />
+  </Target>
+  <Import Project="$(JamAdapterRoot)/JamAdapters.projitems" Condition="'$(JamAdapterRoot)' != ''" />
+</Project>

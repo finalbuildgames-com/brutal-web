@@ -1,0 +1,2 @@
+# Keep third-party license texts byte-for-byte, including their original line endings.
+licenses/** -text -whitespace

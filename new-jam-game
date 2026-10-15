@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+"""Create an isolated jam project. External adapters stay beside the public host."""
+import argparse,json,shutil
+from pathlib import Path
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('name');parser.add_argument('destination',type=Path);parser.add_argument('--adapter',type=Path)
+a=parser.parse_args()
+import re
+if not re.fullmatch('[a-z][a-z0-9-]{0,47}',a.name):parser.error('name must use lowercase letters, numbers and hyphens')
+root=a.destination.resolve();kit=Path(__file__).resolve().parent
+if root.exists():parser.error('destination already exists')
+root.mkdir(parents=True)
+shutil.copytree(kit,root/'host',ignore=shutil.ignore_patterns('build','bin','obj','node_modules','upstream','evidence','__pycache__','.git'))
+(root/'game').mkdir();shutil.move(root/'host/shared/SampleGame.cs',root/'game/SampleGame.cs')
+(root/'game/GameJobs.cs').write_text("""namespace FinalBuild.Brutal;
+// Compiled into Linux, the serial browser host, and the threaded job runtime.
+public static partial class JobKernels {
+ static partial void Configure(){Register("square",(payload,cancellation)=>{cancellation.ThrowIfCancellationRequested();long value=long.Parse(payload,System.Globalization.CultureInfo.InvariantCulture);return checked(value*value).ToString(System.Globalization.CultureInfo.InvariantCulture);});}
+}
+""")
+tests=root/'host/tests/Tests.csproj'
+if tests.exists():tests.write_text(tests.read_text().replace('../shared/SampleGame.cs','../../game/SampleGame.cs'))
+(root/'host/game.json').write_text(json.dumps({'id':a.name,'title':a.name.replace('-',' ').title()},indent=2)+'\n')
+if a.adapter:shutil.copytree(a.adapter.resolve(),root/'adapter',ignore=shutil.ignore_patterns('build','evidence','__pycache__'))
+prefix='''#!/usr/bin/env bash
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ ! -f "$here/adapter-env.sh" ]] || source "$here/adapter-env.sh"
+[[ ! -d "$here/adapter" ]] || export BRUTAL_ADAPTER_ROOT="$here/adapter"
+cd "$here/host"
+'''
+for name,command in {'build-web.sh':'./build-web.sh\nmkdir -p "$here/build"\ncp build/brutal-web-itch.zip "$here/build/'+a.name+'-itch.zip"\n','build-desktop.sh':'exec ./build-desktop.sh\n','run-desktop.sh':'exec ./FinalBuild.Brutal.Desktop/bin/Release/net10.0/linux-x64/publish/FinalBuild.Brutal.Desktop\n','serve.sh':'exec node serve.mjs\n'}.items():
+ p=root/name;p.write_text(prefix+command);p.chmod(0o755)
+(root/'.gitignore').write_text('host/build/\nhost/upstream/\nhost/**/bin/\nhost/**/obj/\nhost/node_modules/\nbuild/\n')
+(root/'README.md').write_text(f'''# {a.name}
+
+One game source tree, Linux and browser: edit `game/SampleGame.cs`. `IRenderLayer`,
+`IPhysicsLayer`, `IAudioLayer`, `IPanelLayer`, `IAssetStore`, `ISaveStore` and
+`IJobLayer` keep platform code in `host/`. The sample includes sprites, glTF,
+Box2D/Jolt box stacks, a HUD, sound and streaming/persistence witnesses.
+
+```sh
+cd host
+git clone https://github.com/ahwootech/BRUTAL.git upstream/brutal
+git -C upstream/brutal checkout b30520d784f71bc3b3fa7907a75e985d6690e326
+./bootstrap-toolchain.sh
+cd ..
+./build-desktop.sh
+./run-desktop.sh
+./build-web.sh
+./serve.sh
+# Isolated browser workers:
+FBS_ISOLATE=1 ./serve.sh
+```
+
+`BRUTAL_SOURCE` can select an existing upstream checkout. External adapters need
+their own source modules; see `adapter-env.sh` if provided. Optional adapters can add alternate panel and audio implementations.
+Host source: https://github.com/finalbuildgames-com/brutal-web.
+
+The itch upload is `build/{a.name}-itch.zip` with `index.html` at its root. Enable
+itch SharedArrayBuffer support for threaded jobs; leave it off to use the serial
+fallback. Selection is automatic, audio uses AudioWorklet in both modes. Do not
+call native physics, files or threads directly from game code. Browser assets
+stream asynchronously before native uploads. Use the save API; IndexedDB and
+files share checksummed/versioned records. Saves use the unique `{a.name}` ID.
+
+Use `host/verify-browser.mjs` with Chrome and `FBS_ISOLATE=0`/`1` for each browser
+mode. Read `host/README.md` for limits, prerequisites, MIME types and licenses.
+Keep MIT host code and private adapters separate when publishing source.
+''')
+print(root)
